@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Delta Team</title>
+    <style>
+      body {
+        margin: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r125/three.min.js"></script>
+    <script src="https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js"></script>
+
+    <script>
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000
+      );
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.listenToKeyEvents(window); // optional
+
+      //controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
+
+      controls.enableDamping = true; // an animation loop is required when either damping or auto-rotation are enabled
+      controls.dampingFactor = 0.05;
+
+      controls.screenSpacePanning = false;
+
+      controls.minDistance = 100;
+      controls.maxDistance = 500;
+
+      controls.maxPolarAngle = Math.PI / 2;
+
+      const light = new THREE.PointLight(0xffffff, 2);
+      scene.add(light);
+
+      function animate() {
+        requestAnimationFrame(animate);
+
+        controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
+
+        render();
+      }
+
+      function render() {
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      const loader = new THREE.GLTFLoader();
+
+      // Load a glTF resource
+      loader.load(
+        // resource URL
+        "./Delta_Fractal_00.gltf",
+        // called when the resource is loaded
+        function (gltf) {
+          scene.add(gltf.scene);
+
+          gltf.animations; // Array<THREE.AnimationClip>
+          gltf.scene; // THREE.Group
+          gltf.scenes; // Array<THREE.Group>
+          gltf.cameras; // Array<THREE.Camera>
+          gltf.asset; // Object
+          gltf.scene.scale.set(30, 30, 30);
+        },
+        // called while loading is progressing
+        function (xhr) {
+          console.log((xhr.loaded / xhr.total) * 100 + "% loaded");
+        },
+        // called when loading has errors
+        function (error) {
+          console.log("An error happened");
+        }
+      );
+
+      const geometry = new THREE.BoxGeometry(1, 1, 1);
+      const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+      const cube = new THREE.Mesh(geometry, material);
+      scene.add(cube);
+      camera.position.z = 5;
+
+      renderer.render(scene, camera);
+    </script>
+  </body>
+</html>
